@@ -1,0 +1,70 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap");
+@import "tailwindcss";
+
+/* Msingi AI calm academic theme: growth greens grounded by slate teal. */
+@theme {
+  /* Primary: newness and growth */
+  --color-sage-50: #eef4f0;
+  --color-sage-100: #dce9e0;
+  --color-sage-200: #bad3c1;
+  --color-sage: #4a7c59;
+  --color-sage-500: #4a7c59;
+  --color-sage-600: #3f6a4c;
+  --color-sage-700: #33573e;
+
+  --color-eucalyptus-50: #f1f7f2;
+  --color-eucalyptus-100: #e1eee3;
+  --color-eucalyptus: #a3c9a8;
+  --color-eucalyptus-500: #a3c9a8;
+  --color-eucalyptus-600: #86b48c;
+
+  /* Secondary: academic grounding (replaces Tailwind's built-in teal) */
+  --color-teal-*: initial;
+  --color-teal-50: #edf1f5;
+  --color-teal-100: #dce4ec;
+  --color-teal-200: #b4c4d3;
+  --color-teal-400: #4f6b85;
+  --color-teal: #1e3d59;
+  --color-teal-500: #1e3d59;
+  --color-teal-600: #18324a;
+  --color-teal-700: #132838;
+
+  /* Backgrounds: calm, low eye-strain */
+  --color-alabaster: #f8f9fa;
+  --color-ivory: #f4f1ea;
+  --color-ivory-dark: #e9e4d8;
+
+  /* Accent: notifications and material checklist alerts */
+  --color-ochre-50: #fbf5ee;
+  --color-ochre-100: #f6eadc;
+  --color-ochre: #d4a373;
+  --color-ochre-500: #d4a373;
+  --color-ochre-700: #8a5a2b;
+
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-serif: "Source Serif 4", Georgia, serif;
+
+  --shadow-card: 0 1px 2px rgba(30, 61, 89, 0.06), 0 4px 16px rgba(30, 61, 89, 0.05);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-alabaster font-sans text-teal antialiased;
+  }
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media print {
+  body {
+    background: white;
+  }
+}

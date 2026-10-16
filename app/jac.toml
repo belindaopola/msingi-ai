@@ -1,0 +1,45 @@
+[project]
+name = "msingi-ai"
+version = "0.1.0"
+description = "Msingi AI: CBC companion for Kenyan teachers, learners and parents (full-stack Jac)"
+entry-point = "main"
+kind = "web-app"
+jac-version = "==0.37.25"
+
+[dependencies]
+
+[dependencies.npm]
+react = "^19.2.0"
+react-dom = "^19.2.0"
+lucide-react = "^0.453.0"
+
+[dependencies.npm.dev]
+vite = "^6.4.1"
+"@vitejs/plugin-react" = "^4.7.0"
+tailwindcss = "^4.1.0"
+"@tailwindcss/vite" = "^4.1.0"
+
+[dev-dependencies]
+[dev-dependencies.pypi]
+watchdog = ">=3.0.0"
+
+[byllm.model]
+# Gemini through LiteLLM; needs GEMINI_API_KEY. Override per shell with BYLLM_DEFAULT_MODEL.
+default_model = "gemini/gemini-3.8-flash"
+
+[client]
+
+[client.app_meta_data]
+title = "Msingi AI"
+description = "Msingi AI: CBC companion for Kenyan teachers, learners and parents."
+theme_color = "#1E3D59"
+
+[client.vite]
+plugins = ["tailwindcss()"]
+lib_imports = ["import tailwindcss from '@tailwindcss/vite'"]
+
+# The UI never needs these enums; pinning them keeps the compiler from emitting a second client copy.
+[placement.pins]
+"models.Role" = "server"
+"models.CurriculumLevel" = "server"
+"models.PlanType" = "server"
