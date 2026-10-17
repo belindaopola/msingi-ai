@@ -1,3 +1,4 @@
+<!-- By Mara Msingi -->
 # Working in this Jac project
 
 This is a [Jac](https://www.jaseci.org/) project. Jac's syntax has evolved and

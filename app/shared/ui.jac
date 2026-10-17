@@ -1,3 +1,4 @@
+# By Mara Msingi
 """Msingi AI UI kit: cards, buttons, badges, form fields and small display helpers."""
 
 import from "lucide-react" { AlertTriangle, Loader2, Sparkles, FileText }
@@ -157,7 +158,8 @@ def:pub Select(
     onValue: Callable[[str], None],
     options: list[str],
     placeholder: str | None = None,
-    label: str = ""
+    label: str = "",
+    labels: dict[str, str] | None = None
 ) -> JsxElement {
     def handle_change(e: ChangeEvent) {
         onValue(e.target.value);
@@ -165,7 +167,7 @@ def:pub Select(
     <select className={INPUT_CLASS} value={value} onChange={handle_change} aria-label={label or None}>
         {placeholder is not None and <option value="">{placeholder}</option>}
         {for o in options {
-            <option key={o} value={o}>{o}</option>
+            <option key={o} value={o}>{(labels[o] if labels and labels[o] else o)}</option>
         }}
     </select>
 }

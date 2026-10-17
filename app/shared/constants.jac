@@ -1,3 +1,4 @@
+# By Mara Msingi
 """Static UI data: roles, benchmark grade tabs, KNEC levels and demo prompts."""
 
 glob ROLES: list[dict[str, any]] = [

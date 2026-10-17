@@ -1,3 +1,4 @@
+# By Mara Msingi
 """Curriculum retrieval for RAG.
 
 Ranks SUB_STRAND CurriculumNodes against a free-text query with a small

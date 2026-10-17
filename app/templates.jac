@@ -1,3 +1,4 @@
+# By Mara Msingi
 """Deterministic fallbacks for every agent.
 
 Used when no LLM provider is configured (or a call fails) so the mockup works

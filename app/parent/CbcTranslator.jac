@@ -1,7 +1,8 @@
+# By Mara Msingi
 """Plain-language CBE translator: turns school messages full of CBE terms into practical guidance."""
 
 import from "lucide-react" { BookA, Inbox, Languages, MessageCircleQuestion, Sparkle, TrendingUp }
-sv import from ..endpoints { translate_for_parent }
+import from ..endpoints { translate_for_parent }
 # Aliased: spawning a walker emits same-named wire classes for its report types in this module.
 import from ..models { GradeSummary as GradeSummaryData }
 import from ..shared.constants { LANGUAGES }

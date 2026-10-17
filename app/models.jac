@@ -1,3 +1,4 @@
+# By Mara Msingi
 """Msingi AI graph schema and wire types.
 
 Graph shape (persistent, hangs off the shared root):
@@ -85,6 +86,11 @@ node AccountProfile {
         email: str,
         app_role: str,
         grade_code: str = "PP2";
+}
+
+"""Per-grade board on root.shared that teacher broadcasts (PlanNodes) hang off, so parents' roots can read them."""
+node BroadcastBoard {
+    has grade_code: str;
 }
 
 obj AccountSession {

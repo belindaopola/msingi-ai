@@ -1,3 +1,4 @@
+# By Mara Msingi
 """Teacher workspace: lesson plans, material planning and parent broadcasts."""
 
 import from ..models { GradeSummary, GradeCurriculum }

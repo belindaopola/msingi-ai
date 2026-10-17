@@ -1,21 +1,14 @@
+# By Mara Msingi
 
-import from "@jac/runtime" { jacLogin, jacSignup, useNavigate }
+import from "@jac/runtime" { SignupResult, jacIsLoggedIn, jacLogin, jacSignup, useNavigate }
 import from "lucide-react" { Sprout, LockKeyhole, UserRound, ArrowRight }
-sv import from ..endpoints { get_current_session, set_account_profile }
+import from ..endpoints { get_current_session, set_account_profile }
 import from ..shared.ui { Button, Field, Input, Select }
 
- glob ACCESS_ROLES: list[dict[str, str]] = [
-    {"value": "TEACHER", "label": "Teacher"},
-    {"value": "LEARNER", "label": "Learner"},
-    {"value": "PARENT", "label": "Parent"}
-];
-glob ACCESS_GRADES: list[dict[str, str]] = [
-    {"value": "PP2", "label": "PP2 Early Years"},
-    {"value": "Grade 3", "label": "Grade 3"},
-    {"value": "Grade 6", "label": "Grade 6"},
-    {"value": "Grade 9", "label": "Grade 9"},
-    {"value": "Grade 12", "label": "Grade 12"}
-];
+glob ACCESS_ROLES: list[str] = ["TEACHER", "LEARNER", "PARENT"];
+glob ROLE_LABELS: dict[str, str] = {"TEACHER": "Teacher", "LEARNER": "Learner", "PARENT": "Parent"};
+glob ACCESS_GRADES: list[str] = ["PP2", "Grade 3", "Grade 6", "Grade 9", "Grade 12"];
+glob GRADE_LABELS: dict[str, str] = {"PP2": "PP2 Early Years"};
 
 def:pub AccountAccess() -> JsxElement {
     nav = useNavigate();
@@ -28,20 +21,43 @@ def:pub AccountAccess() -> JsxElement {
         error: str = "",
         busy: bool = False;
 
+    # A signed-in account with no profile (e.g. signup interrupted) finishes setup here instead of signing up again.
+    async can with entry {
+        if jacIsLoggedIn() {
+            await open_workspace();
+        }
+    }
+
+    async def open_workspace -> None {
+        current: any = None;
+        current = await get_current_session();
+        if current {
+            nav("/");
+        } else {
+            mode = "profile";
+        }
+    }
+
     async def submit(e: FormEvent) -> None {
         e.preventDefault();
-        if len(password) < 8 {
+        if mode != "profile" and len(password) < 8 {
             error = "Use a password with at least 8 characters.";
             return;
         }
         busy = True;
         error = "";
         try {
+            if mode == "profile" {
+                _saved = await set_account_profile(name.strip() or "Msingi user", email.strip(), role, grade);
+                nav("/");
+                busy = False;
+                return;
+            }
             if mode == "signup" {
-                signup_result: dict | None = None;
+                signup_result: SignupResult | None = None;
                 signup_result = await jacSignup(email.strip(), password);
-                if not signup_result["success"] {
-                    error = str(signup_result["error"] or "Could not create the account.");
+                if not signup_result or not signup_result.success {
+                    error = str((signup_result.error if signup_result else "") or "Could not create the account.");
                     busy = False;
                     return;
                 }
@@ -55,8 +71,10 @@ def:pub AccountAccess() -> JsxElement {
             }
             if mode == "signup" {
                 _profile = await set_account_profile(name.strip() or email.split("@")[0], email.strip(), role, grade);
+                nav("/");
+            } else {
+                await open_workspace();
             }
-            nav("/");
         } except Exception as err {
             error = str(err) or "Account access failed. Please try again.";
         }
@@ -85,23 +103,23 @@ def:pub AccountAccess() -> JsxElement {
                 </div>
                 <div className="mb-6">
                     <div className="mb-4 grid size-11 place-items-center rounded-2xl bg-[var(--role-surface-tint)] text-[var(--role-primary)]"><LockKeyhole size={20}/></div>
-                    <h2 className="font-serif text-2xl font-bold text-teal">{ "Create your account" if mode == "signup" else "Welcome back" }</h2>
-                    <p className="mt-1 text-sm text-teal-400">{ "Your plans and saved learning work stay with your account." if mode == "signup" else "Sign in to continue to your Msingi workspace." }</p>
+                    <h2 className="font-serif text-2xl font-bold text-teal">{ "Create your account" if mode == "signup" else ("Finish setting up" if mode == "profile" else "Welcome back") }</h2>
+                    <p className="mt-1 text-sm text-teal-400">{ "Your plans and saved learning work stay with your account." if mode == "signup" else ("Tell us your role and grade to open your workspace." if mode == "profile" else "Sign in to continue to your Msingi workspace.") }</p>
                 </div>
-                <div role="tablist" aria-label="Account action" className="mb-5 flex rounded-xl bg-ivory p-1">
+                {mode != "profile" and <div role="tablist" aria-label="Account action" className="mb-5 flex rounded-xl bg-ivory p-1">
                     <button type="button" role="tab" aria-selected={mode == "signup"} onClick={lambda (e: MouseEvent) { mode = "signup"; error = ""; }} className={"flex-1 rounded-lg px-3 py-2 text-sm font-semibold " + ("bg-white text-teal shadow-sm" if mode == "signup" else "text-teal-400")}>Create account</button>
                     <button type="button" role="tab" aria-selected={mode == "login"} onClick={lambda (e: MouseEvent) { mode = "login"; error = ""; }} className={"flex-1 rounded-lg px-3 py-2 text-sm font-semibold " + ("bg-white text-teal shadow-sm" if mode == "login" else "text-teal-400")}>Sign in</button>
-                </div>
+                </div>}
                 <form onSubmit={submit} className="flex flex-col gap-4">
-                    {mode == "signup" and <Field label="Your name"><Input value={name} onValue={lambda (v: str) { name = v; }} placeholder="e.g. Wanjiku Kamau" required={True}/></Field>}
-                    <Field label="Email address"><Input kind="email" value={email} onValue={lambda (v: str) { email = v; }} placeholder="you@example.com" required={True}/></Field>
-                    <Field label="Password" hint="Use at least 8 characters."><Input kind="password" value={password} onValue={lambda (v: str) { password = v; }} placeholder="At least 8 characters" required={True}/></Field>
-                    {mode == "signup" and <div className="grid gap-4 sm:grid-cols-2">
-                        <Field label="Your role"><Select value={role} onValue={lambda (v: str) { role = v; }} options={ACCESS_ROLES}/></Field>
-                        <Field label="Grade"><Select value={grade} onValue={lambda (v: str) { grade = v; }} options={ACCESS_GRADES}/></Field>
+                    {mode != "login" and <Field label="Your name"><Input value={name} onValue={lambda (v: str) { name = v; }} placeholder="e.g. Wanjiku Kamau" required={True}/></Field>}
+                    <Field label="Email address"><Input kind="email" value={email} onValue={lambda (v: str) { email = v; }} placeholder="you@example.com" required={mode != "profile"}/></Field>
+                    {mode != "profile" and <Field label="Password" hint="Use at least 8 characters."><Input kind="password" value={password} onValue={lambda (v: str) { password = v; }} placeholder="At least 8 characters" required={True}/></Field>}
+                    {mode != "login" and <div className="grid gap-4 sm:grid-cols-2">
+                        <Field label="Your role"><Select value={role} onValue={lambda (v: str) { role = v; }} options={ACCESS_ROLES} labels={ROLE_LABELS}/></Field>
+                        <Field label="Grade"><Select value={grade} onValue={lambda (v: str) { grade = v; }} options={ACCESS_GRADES} labels={GRADE_LABELS}/></Field>
                     </div>}
                     {error and <p role="alert" className="rounded-xl border border-ochre/50 bg-ochre-50 px-3 py-2 text-sm text-ochre-700">{error}</p>}
-                    <Button submit={True} loading={busy} className="mt-1 w-full rounded-full bg-[var(--role-primary)] text-white shadow-md">{ "Create account" if mode == "signup" else "Sign in" } <ArrowRight size={16}/></Button>
+                    <Button submit={True} loading={busy} className="mt-1 w-full rounded-full bg-[var(--role-primary)] text-white shadow-md">{ "Create account" if mode == "signup" else ("Open my workspace" if mode == "profile" else "Sign in") } <ArrowRight size={16}/></Button>
                 </form>
                 <p className="mt-5 flex items-start gap-2 text-xs leading-relaxed text-teal-400"><UserRound size={14} className="mt-0.5 shrink-0"/>Parents need an account link from their learner before learner-specific progress can be shared.</p>
             </section>

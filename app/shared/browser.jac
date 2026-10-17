@@ -1,3 +1,4 @@
+# By Mara Msingi
 """Browser-side helpers: dates, remembered choices and readable error messages."""
 
 """Format an ISO date (or datetime) for Kenyan readers, e.g. '16 Oct'."""

@@ -1,3 +1,4 @@
+# By Mara Msingi
 """byLLM agents for Msingi AI.
 
 Each agent is a `by llm()` function whose prompt is built from its `sem`
