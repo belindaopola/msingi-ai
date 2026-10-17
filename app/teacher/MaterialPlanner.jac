@@ -1,7 +1,7 @@
 """Locally available material planner: free and low-cost items scaled to the class."""
 
 import from "lucide-react" { Package, ShieldAlert, Wand2 }
-import from ..endpoints { plan_class_materials }
+sv import from ..endpoints { plan_class_materials }
 # Aliased: spawning a walker emits same-named wire classes for its report types in this module.
 import from ..models { GradeSummary as GradeSummaryData, GradeCurriculum as GradeCurriculumData, MaterialPlanResult as MaterialPlanResultData }
 import from ..shared.useCurriculumPicker { useCurriculumPicker }

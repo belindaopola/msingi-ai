@@ -4,7 +4,7 @@ import from endpoints {
     seed_kicd_graph, list_grades, get_curriculum, generate_lesson_plan,
     plan_class_materials, build_revision_and_materials, socratic_tutor,
     translate_for_parent, list_plans, get_learner_progress,
-    get_current_session, set_account_profile, save_checklist_progress
+    save_checklist_progress
 }
 import "./assets/main.css";
 import from .shell.AppShell { AppShell }

@@ -1,7 +1,7 @@
 """Holistic progress tracker: learning areas, core competencies and values, using KNEC levels."""
 
 import from "lucide-react" { Activity, Award, StickyNote }
-import from ..endpoints { get_learner_progress }
+sv import from ..endpoints { get_learner_progress }
 # Aliased: spawning a walker emits same-named wire classes for its report types in this module.
 import from ..models { GradeSummary as GradeSummaryData, LearnerProgress as LearnerProgressData }
 import from ..shared.constants { KNEC_LEVELS }

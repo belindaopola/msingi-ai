@@ -1,7 +1,7 @@
 """Parent broadcast: teachers write in CBE terms; parents receive a plain-language guide."""
 
 import from "lucide-react" { CheckCircle2, Megaphone, Send }
-import from ..endpoints { translate_for_parent, list_plans }
+sv import from ..endpoints { translate_for_parent, list_plans }
 # Aliased: spawning a walker emits same-named wire classes for its report types in this module.
 import from ..models { ParentGuideResult as ParentGuideResultData, PlanSummary as PlanSummaryData }
 import from ..models { GradeSummary, GradeCurriculum }

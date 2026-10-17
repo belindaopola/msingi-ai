@@ -13,7 +13,7 @@ def:pub BackendBanner(status: str, message: str, onRetry: Callable[[], None]) ->
     if status != "offline" {
         return <></>;
     }
-    <div role="alert" className="rounded-2xl border border-ochre bg-ochre-50 p-5">
+    return <div role="alert" className="rounded-2xl border border-ochre bg-ochre-50 p-5">
         <div className="flex items-start gap-3">
             <ServerCrash className="mt-0.5 shrink-0 text-ochre-700" size={20} aria-hidden="true"/>
             <div className="flex-1 text-sm text-teal">
@@ -25,5 +25,5 @@ def:pub BackendBanner(status: str, message: str, onRetry: Callable[[], None]) ->
             </div>
             <Button variant="secondary" onClick={onRetry}>Retry</Button>
         </div>
-    </div>
+    </div>;
 }

@@ -72,6 +72,7 @@ def:pub AppShell(role: str, gradeCode: str) -> JsxElement {
     def reset_demo -> None { boot(True); }
 
     if not jacIsLoggedIn() { return <Navigate to="/account" replace={True}/>; }
+    if status == "profile-required" { return <Navigate to="/account" replace={True}/>; }
     matches = [g for g in grades if g.code == gradeCode];
     grade: GradeSummaryData | None = matches[0] if matches else (grades[0] if grades else None);
     curriculum: GradeCurriculumData | None = curricula[grade.code] if grade else None;

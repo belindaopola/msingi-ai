@@ -1,6 +1,6 @@
 """Parent workspace: CBE translator, home activities and the holistic progress tracker."""
 
-import from ..endpoints { list_plans }
+sv import from ..endpoints { list_plans }
 # Aliased: spawning a walker emits same-named wire classes for its report types in this module.
 import from ..models { GradeSummary as GradeSummaryData, GradeCurriculum as GradeCurriculumData, PlanSummary as PlanSummaryData }
 import from .CbcTranslator { CbcTranslator }

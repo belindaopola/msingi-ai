@@ -1,6 +1,6 @@
 
 import from "lucide-react" { CalendarDays, CheckCircle, Clock, HeartPulse, Wand2, Sparkles, Check, Leaf, UserRound }
-import from ..endpoints { build_revision_and_materials }
+sv import from ..endpoints { build_revision_and_materials }
 # Aliased: spawning a walker emits same-named wire classes for its report types in this module.
 import from ..models { GradeSummary as GradeSummaryData, GradeCurriculum as GradeCurriculumData, RevisionResult as RevisionResultData }
 import from ..shared.browser { error_text, format_date, iso_day }

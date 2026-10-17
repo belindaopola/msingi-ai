@@ -53,13 +53,10 @@ def:pub AccountAccess() -> JsxElement {
                 busy = False;
                 return;
             }
-            existing = await get_current_session();
-            if mode == "signup" or existing is None {
-                profile = await set_account_profile(name.strip() or email.split("@")[0], email.strip(), role, grade);
-                nav("/");
-            } else {
-                nav("/");
+            if mode == "signup" {
+                _profile = await set_account_profile(name.strip() or email.split("@")[0], email.strip(), role, grade);
             }
+            nav("/");
         } except Exception as err {
             error = str(err) or "Account access failed. Please try again.";
         }
