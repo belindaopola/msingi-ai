@@ -1,3 +1,4 @@
+# By Mara Msingi
 """Cascading learning area > strand > sub-strand selection over a grade's curriculum tree."""
 
 import from ..models { GradeCurriculum, CurriculumBranch }

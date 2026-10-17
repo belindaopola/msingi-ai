@@ -1,3 +1,4 @@
+# By Mara Msingi
 """Holistic progress tracker: learning areas, core competencies and values, using KNEC levels."""
 
 import from "lucide-react" { Activity, Award, StickyNote }

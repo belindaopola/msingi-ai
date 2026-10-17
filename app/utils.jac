@@ -1,3 +1,4 @@
+# By Mara Msingi
 """Shared helpers: house-style scrubbing, serialization, dates and LLM gating."""
 
 import os;

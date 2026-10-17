@@ -1,3 +1,4 @@
+# By Mara Msingi
 """Create sample sign-in accounts: a teacher, a learner and a parent per benchmark grade.
 
 Usage: python3 scripts/seed_accounts.py [base_url]   (default http://localhost:8000)

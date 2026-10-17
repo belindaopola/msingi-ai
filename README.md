@@ -1,3 +1,4 @@
+<!-- By Mara Msingi -->
 # Msingi AI
 
 A companion for Kenya's Competency-Based Education (CBE), with separate workspaces for teachers, learners and parents. It covers the five KICD benchmark grades: PP2, Grade 3, Grade 6, Grade 9 and Grade 12.

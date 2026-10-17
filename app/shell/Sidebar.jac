@@ -1,3 +1,4 @@
+# By Mara Msingi
 
 import from "@jac/runtime" { jacLogout, useNavigate }
 import from "lucide-react" { BookOpenCheck, GraduationCap, HeartHandshake, LogOut, Sprout, CalendarDays, ClipboardCheck, MessageCircleQuestion }

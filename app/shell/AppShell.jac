@@ -1,3 +1,4 @@
+# By Mara Msingi
 
 import from "@jac/runtime" { jacIsLoggedIn, Navigate }
 import from ..endpoints { seed_kicd_graph, list_grades, get_curriculum, get_current_session }

@@ -1,3 +1,4 @@
+# By Mara Msingi
 """Mwalimu Taratibu guides learners with questions and hints so they discover answers themselves."""
 
 import from "lucide-react" { HelpCircle, Lightbulb, MessagesSquare, RotateCcw, SendHorizontal }

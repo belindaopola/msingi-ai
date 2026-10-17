@@ -1,3 +1,4 @@
+# By Mara Msingi
 """Plain-language CBE translator: turns school messages full of CBE terms into practical guidance."""
 
 import from "lucide-react" { BookA, Inbox, Languages, MessageCircleQuestion, Sparkle, TrendingUp }

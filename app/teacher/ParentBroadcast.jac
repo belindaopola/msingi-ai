@@ -1,3 +1,4 @@
+# By Mara Msingi
 """Parent broadcast: teachers write in CBE terms; parents receive a plain-language guide."""
 
 import from "lucide-react" { CheckCircle2, Megaphone, Send }

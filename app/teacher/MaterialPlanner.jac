@@ -1,3 +1,4 @@
+# By Mara Msingi
 """Locally available material planner: free and low-cost items scaled to the class."""
 
 import from "lucide-react" { Package, ShieldAlert, Wand2 }

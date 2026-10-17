@@ -1,3 +1,4 @@
+# By Mara Msingi
 """Activities from the active translation, or curriculum home links when nothing has been translated yet."""
 
 import from "lucide-react" { Clock, Home }

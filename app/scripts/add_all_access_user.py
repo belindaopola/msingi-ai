@@ -1,3 +1,4 @@
+# By Mara Msingi
 """Create (or update) one account that can switch between all Msingi workspaces.
 
 Usage:

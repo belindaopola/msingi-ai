@@ -1,3 +1,4 @@
+# By Mara Msingi
 
 import from "@jac/runtime" { SignupResult, jacIsLoggedIn, jacLogin, jacSignup, useNavigate }
 import from "lucide-react" { Sprout, LockKeyhole, UserRound, ArrowRight }

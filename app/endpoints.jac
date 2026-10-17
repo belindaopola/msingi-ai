@@ -1,3 +1,4 @@
+# By Mara Msingi
 """Msingi AI server: KICD curriculum graph + multi-agent walkers.
 
 Every `walker:pub` below is a REST endpoint at `POST /walker/<name>`, with its

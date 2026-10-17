@@ -1,3 +1,4 @@
+# By Mara Msingi
 """Msingi AI UI kit: cards, buttons, badges, form fields and small display helpers."""
 
 import from "lucide-react" { AlertTriangle, Loader2, Sparkles, FileText }

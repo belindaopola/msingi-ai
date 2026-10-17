@@ -1,3 +1,4 @@
+# By Mara Msingi
 """KICD-aligned seed data for the five Msingi AI benchmark grades.
 
 Mock content modelled on the KICD Competency Based Education designs for

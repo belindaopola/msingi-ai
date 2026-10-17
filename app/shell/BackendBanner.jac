@@ -1,3 +1,4 @@
+# By Mara Msingi
 """Connection notice: a spinner while loading, an alert with Retry when the server is unreachable."""
 
 import from "lucide-react" { Loader2, ServerCrash }

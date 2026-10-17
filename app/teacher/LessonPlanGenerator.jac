@@ -1,3 +1,4 @@
+# By Mara Msingi
 """KICD lesson plan generator with a printable plan document and 4-tier KNEC rubric."""
 
 import from "lucide-react" { ClipboardList, Printer, Wand2 }

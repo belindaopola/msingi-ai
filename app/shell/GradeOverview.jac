@@ -1,3 +1,4 @@
+# By Mara Msingi
 
 import from "lucide-react" { CalendarClock, Target, Users, FlaskConical, Palette, Globe2 }
 import from ..models { GradeSummary, GradeCurriculum }

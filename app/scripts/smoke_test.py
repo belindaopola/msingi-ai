@@ -1,3 +1,4 @@
+# By Mara Msingi
 """End-to-end smoke test for the Msingi AI walker endpoints.
 
 Usage: python3 scripts/smoke_test.py [base_url]   (default http://localhost:8000)

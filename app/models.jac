@@ -1,3 +1,4 @@
+# By Mara Msingi
 """Msingi AI graph schema and wire types.
 
 Graph shape (persistent, hangs off the shared root):

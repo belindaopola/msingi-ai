@@ -1,3 +1,4 @@
+# By Mara Msingi
 
 import from "lucide-react" { BellRing, ListChecks, ShieldAlert }
 import from ..models { GradeSummary, GradeCurriculum, RevisionResult }
