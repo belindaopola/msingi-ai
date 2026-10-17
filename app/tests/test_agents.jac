@@ -6,7 +6,7 @@ import from jaclang.byllm.lib { MockLLM }
 import from models { TutorReply }
 import from endpoints { socratic_tutor, seed_kicd_graph }
 
-test "socratic tutor uses the AI agent and scrubs em dashes" {
+test "Mwalimu Taratibu uses the AI agent and scrubs em dashes" {
     os.environ["GEMINI_API_KEY"] = "test-key";
     os.environ.pop("MSINGI_OFFLINE", None);
     mock = MockLLM(outputs=[TutorReply(

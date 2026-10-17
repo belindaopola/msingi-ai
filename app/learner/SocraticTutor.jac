@@ -1,4 +1,4 @@
-"""Socratic AI tutor: answers with questions and hints so learners discover the answer themselves."""
+"""Mwalimu Taratibu guides learners with questions and hints so they discover answers themselves."""
 
 import from "lucide-react" { HelpCircle, Lightbulb, MessagesSquare, RotateCcw, SendHorizontal }
 import from ..endpoints { socratic_tutor }
@@ -64,7 +64,7 @@ def:pub SocraticTutor(grade: GradeSummaryData, curriculum: GradeCurriculumData |
     <Card
         id="tutor"
         icon={<MessagesSquare size={18} aria-hidden="true"/>}
-        title="Socratic AI Tutor"
+        title="Mwalimu Taratibu"
         subtitle="Your tutor answers with questions and hints so you discover the answer yourself. It will not do your homework for you."
         actions={len(messages) > 0 and <Button variant="ghost" icon={<RotateCcw size={16} aria-hidden="true"/>} onClick={restart}>New chat</Button>}
     >
