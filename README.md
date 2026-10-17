@@ -34,6 +34,18 @@ jac run --dev main.jac
 
 Then open http://localhost:8000. In dev mode the UI is served on port 8000 with hot reload, and the API on port 8001.
 
+### Production, sandboxes and proxies
+
+Dev mode depends on a Vite hot-reload websocket. Behind a proxy that doesn't forward it (common in cloud sandboxes), the page reloads in a loop, and the log fills with `GET /__build_status` and repeated `seed_kicd_graph` / `list_grades` calls. Build and serve a sealed bundle instead:
+
+```bash
+cd app
+jac build                        # writes dist/msingi-ai.jab
+jac run dist/msingi-ai.jab       # serves UI and API together on port 8000
+```
+
+A bare `jac run` (or `jac run main.jac --no-dev`) still starts in dev mode for this project, so run the `.jab` bundle. Rebuild after every code change.
+
 The curriculum graph and demo people (a teacher, plus one learner and one parent per grade) are created automatically on first use. **Reset demo data** in the sidebar wipes saved plans and tutor chats and rebuilds the graph.
 
 ## Configuration
