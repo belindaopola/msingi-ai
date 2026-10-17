@@ -1,7 +1,7 @@
 """KICD lesson plan generator with a printable plan document and 4-tier KNEC rubric."""
 
 import from "lucide-react" { ClipboardList, Printer, Wand2 }
-sv import from ..endpoints { generate_lesson_plan }
+import from ..endpoints { generate_lesson_plan }
 # Aliased: spawning a walker emits same-named wire classes for its report types in this module.
 import from ..models { GradeSummary as GradeSummaryData, GradeCurriculum as GradeCurriculumData, LessonPlan as LessonPlanData, LessonPlanResult as LessonPlanResultData }
 import from ..shared.useCurriculumPicker { useCurriculumPicker }

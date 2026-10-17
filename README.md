@@ -44,9 +44,19 @@ jac build                        # writes dist/msingi-ai.jab
 jac run dist/msingi-ai.jab       # serves UI and API together on port 8000
 ```
 
+If `jac build` reports "Built template package `dist/msingi-ai-.jab`" (about 60 KB) instead of the app bundle (about 1.8 MB), the `[jacpack]` section in `app/jac.toml`, which the Jac IDE adds, has switched it to template packaging. Build without that section to get the app bundle.
+
+Set your own sign-in secret before serving, for example `export JAC_SERVE_AUTH_SECRET=$(openssl rand -hex 32)` (or `[serve.auth] secret` in `jac.toml`). Without it, a cluster deployment falls back to a known placeholder key and anyone could forge sign-in tokens.
+
 A bare `jac run` (or `jac run main.jac --no-dev`) still starts in dev mode for this project, so run the `.jab` bundle. Rebuild after every code change.
 
-The curriculum graph and demo people (a teacher, plus one learner and one parent per grade) are created automatically on first use. **Reset demo data** in the sidebar wipes saved plans and tutor chats and rebuilds the graph.
+## Accounts and data
+
+Everyone signs in. The first visit goes to `/account`, where people create an account with their name, email, password, role (Teacher, Learner or Parent) and grade. The role and grade decide which workspace opens. An account that signs in without a profile is asked to finish setting up before the workspace opens.
+
+Each account has its own private graph. On first use it gets its own copy of the KICD curriculum and demo people (a teacher, plus one learner and one parent per grade), and its saved plans, tutor chats and checklist ticks are visible only to that account.
+
+The one exception is **parent broadcasts**. When a teacher sends one, it's pinned to a shared per-grade board on `root.shared`, so every parent account in that grade sees it under "From your child's teacher". Broadcasts are signed with the teacher's account name. Linking parents to their own learner's progress isn't built yet; the progress tracker shows the demo learner.
 
 ## Configuration
 
@@ -63,13 +73,14 @@ Model names are passed to LiteLLM, so any model id LiteLLM supports will work, i
 ```
 app/
 ├── main.jac              entry point: registers the server walkers, mounts the UI
-├── endpoints.jac         walker:pub endpoints (POST /walker/<name>) and agent runners
+├── endpoints.jac         walker endpoints (POST /walker/<name>), account functions, agent runners
 ├── models.jac            graph nodes and edges, read models, LLM output types
 ├── agents.jac            byLLM agent functions (lesson plan, materials, revision, tutor, parent guide)
 ├── templates.jac         curriculum-grounded fallbacks used without an LLM
 ├── retrieval.jac         keyword retrieval of sub-strands for grounding
 ├── seed_data.jac         KICD curriculum and demo people for the five grades
 ├── utils.jac             dash scrubbing, JSON helpers, LLM gating, term week windows
+├── account/              sign-up, sign-in and profile setup page
 ├── shell/                app shell: sidebar, header, grade tabs, overview, status banner
 ├── teacher/ learner/ parent/   one component per tool, grouped by workspace
 ├── shared/               UI kit, constants, browser helpers, curriculum picker hook
@@ -80,7 +91,7 @@ app/
 
 ### API
 
-Each walker is also a plain REST endpoint. The JSON body sets the walker's fields, and the results come back in `data.reports`:
+Each walker is also a plain REST endpoint. The JSON body sets the walker's fields, and the results come back in `data.reports`. `seed_kicd_graph`, `list_grades` and `get_curriculum` are public; everything else requires a signed-in account and returns 401 without one:
 
 | Walker | Purpose |
 |---|---|
@@ -91,10 +102,19 @@ Each walker is also a plain REST endpoint. The JSON body sets the walker's field
 | `build_revision_and_materials` | Learner revision calendar plus material checklist |
 | `socratic_tutor` | One tutor turn; pass back `session_id` to continue a chat |
 | `translate_for_parent` | Plain-language guide; `broadcast: true` saves it for parents |
-| `list_plans`, `get_learner_progress` | Saved plans and the learner's progress record |
+| `list_plans`, `get_learner_progress` | Saved plans (broadcasts come from the shared grade board) and the learner's progress record |
+
+Account functions are served at `POST /function/<name>`: `get_current_session`, `set_account_profile` and `save_checklist_progress`.
 
 ```bash
-curl -X POST localhost:8001/walker/get_curriculum \
+# Register and sign in, then send the token as a Bearer header
+curl -X POST localhost:8001/user/register -H 'Content-Type: application/json' \
+  -d '{"identities": [{"type": "email", "value": "me@example.com"}], "credential": {"type": "password", "password": "secret123"}}'
+TOKEN=$(curl -s -X POST localhost:8001/user/login -H 'Content-Type: application/json' \
+  -d '{"identity": {"type": "email", "value": "me@example.com"}, "credential": {"type": "password", "password": "secret123"}}' \
+  | python3 -c 'import sys, json; print(json.load(sys.stdin)["data"]["token"])')
+
+curl -X POST localhost:8001/walker/list_plans -H "Authorization: Bearer $TOKEN" \
   -H 'Content-Type: application/json' -d '{"grade_level": "Grade 6"}'
 ```
 
@@ -103,7 +123,7 @@ curl -X POST localhost:8001/walker/get_curriculum \
 ```bash
 cd app
 jac test tests/test_agents.jac             # agent path with a mock LLM
-python3 scripts/smoke_test.py http://localhost:8001   # needs the dev server running
+python3 scripts/smoke_test.py http://localhost:8001   # needs the dev server; registers a throwaway account
 jac check main.jac                         # type-check
 ```
 
@@ -111,6 +131,9 @@ jac check main.jac                         # type-check
 
 - Run `jac guide` before editing `.jac` files. Jac syntax looks like Python and JSX but has its own rules (see `app/AGENTS.md`).
 - **Don't move or rename `models.jac`.** Persisted nodes are tied to the module path that declares them, so moving it orphans existing graph data.
+- Access levels: `:pub` is public, `:protect` requires sign-in and runs on the caller's own graph, and `:priv` (or no marker) is **never served**, so the browser can't call it. Endpoints the UI uses must be `:pub` or `:protect`.
+- There are no `sv`/`cl` placement markers in this Jac version. Use plain `import`; placement is inferred.
+- In production, set `[serve.auth] secret` (or `JAC_SERVE_AUTH_SECRET`) so sign-in tokens are signed with your own key.
 - Agent output must not contain em or en dashes. `utils.scrub` removes them, and the smoke test fails if any appear.
 - Workarounds for three Jac 0.37.25 compiler issues:
   - The enums in `models.jac` are pinned to the server in `[placement.pins]`; otherwise they are emitted twice in the client bundle.

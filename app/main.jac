@@ -14,7 +14,9 @@ def:pub app -> JsxElement {
     return <Router>
         <Routes>
             <Route path="/account" element={<AccountAccess/>}/>
-            <Route path="/" element={<AuthGuard redirect="/account"/>}><AppShell/></Route>
+            <Route element={<AuthGuard redirect="/account"/>}>
+                <Route path="/" element={<AppShell/>}/>
+            </Route>
             <Route path="*" element={<Navigate to="/" replace={True}/>}/>
         </Routes>
     </Router>;

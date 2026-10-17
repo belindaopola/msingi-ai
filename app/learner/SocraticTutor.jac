@@ -1,7 +1,7 @@
 """Mwalimu Taratibu guides learners with questions and hints so they discover answers themselves."""
 
 import from "lucide-react" { HelpCircle, Lightbulb, MessagesSquare, RotateCcw, SendHorizontal }
-sv import from ..endpoints { socratic_tutor }
+import from ..endpoints { socratic_tutor }
 # Aliased: spawning a walker emits same-named wire classes for its report types in this module.
 import from ..models { GradeSummary as GradeSummaryData, GradeCurriculum as GradeCurriculumData, TutorReply as TutorReplyData }
 import from ..shared.constants { TUTOR_STARTERS }

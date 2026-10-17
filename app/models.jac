@@ -87,6 +87,11 @@ node AccountProfile {
         grade_code: str = "PP2";
 }
 
+"""Per-grade board on root.shared that teacher broadcasts (PlanNodes) hang off, so parents' roots can read them."""
+node BroadcastBoard {
+    has grade_code: str;
+}
+
 obj AccountSession {
     has display_name: str,
         email: str,

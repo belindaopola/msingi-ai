@@ -1,24 +1,45 @@
 """End-to-end smoke test for the Msingi AI walker endpoints.
 
 Usage: python3 scripts/smoke_test.py [base_url]   (default http://localhost:8000)
-Exercises every walker for every benchmark grade and fails on any error or
+Registers a throwaway account (the agent walkers are walker:protect), then
+exercises every walker for every benchmark grade and fails on any error or
 on any em/en dash in a response.
 """
 
 import json
 import sys
+import time
 import urllib.request
 
 BASE = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8000"
 GRADES = ["PP2", "Grade 3", "Grade 6", "Grade 9", "Grade 12"]
 DASHES = ("—", "–")
+TOKEN = ""
+
+
+def post(path, body):
+    req = urllib.request.Request(
+        f"{BASE}{path}",
+        data=json.dumps(body).encode(),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(req, timeout=60) as resp:
+        return json.loads(resp.read().decode())
+
+
+def sign_in():
+    email = f"smoke{int(time.time())}@example.com"
+    credential = {"type": "password", "password": "smoke-test-pass"}
+    post("/user/register", {"identities": [{"type": "email", "value": email}], "credential": credential})
+    return post("/user/login", {"identity": {"type": "email", "value": email}, "credential": credential})["data"]["token"]
 
 
 def call(walker, body=None):
     req = urllib.request.Request(
         f"{BASE}/walker/{walker}",
         data=json.dumps(body or {}).encode(),
-        headers={"Content-Type": "application/json"},
+        headers={"Content-Type": "application/json", "Authorization": f"Bearer {TOKEN}"},
         method="POST",
     )
     try:
@@ -35,6 +56,8 @@ def call(walker, body=None):
 
 
 def main():
+    global TOKEN
+    TOKEN = sign_in()
     seed = call("seed_kicd_graph", {"reset": True})[0]
     print("seed:", seed["status"], seed["grades"], seed["curriculum_nodes"], "nodes,", seed["users"], "users")
     assert seed["grades"] == GRADES

@@ -1,7 +1,7 @@
 
 import from "lucide-react" { BellRing, ListChecks, ShieldAlert }
 import from ..models { GradeSummary, GradeCurriculum, RevisionResult }
-sv import from ..endpoints { save_checklist_progress }
+import from ..endpoints { save_checklist_progress }
 import from ..shared.ui { Card, EmptyState, ProgressBar, ErrorNote }
 
 """Before a plan exists, preview locally available materials from the curriculum graph."""

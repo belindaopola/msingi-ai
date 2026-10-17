@@ -1,6 +1,6 @@
 
 import from "@jac/runtime" { jacIsLoggedIn, Navigate }
-sv import from ..endpoints { seed_kicd_graph, list_grades, get_curriculum, get_current_session }
+import from ..endpoints { seed_kicd_graph, list_grades, get_curriculum, get_current_session }
 import from ..models { GradeSummary as GradeSummaryData, GradeCurriculum as GradeCurriculumData }
 import from ..shared.browser { error_text }
 import from .Sidebar { Sidebar }
@@ -12,27 +12,35 @@ import from ..teacher.TeacherView { TeacherView }
 import from ..learner.LearnerView { LearnerView }
 import from ..parent.ParentView { ParentView }
 
-def:pub AppShell(role: str, gradeCode: str) -> JsxElement {
-    has grades: list[GradeSummaryData] = [],
+"""Signed-in workspace. The role and starting grade come from the account profile (`get_current_session`)."""
+def:pub AppShell -> JsxElement {
+    has role: str = "",
+        gradeCode: str = "PP2",
+        grades: list[GradeSummaryData] = [],
         curricula: dict[str, GradeCurriculumData] = {},
         status: str = "connecting",
         statusMessage: str = "";
 
     async can with entry {
-        if jacIsLoggedIn() {
-            try {
-                current = await get_current_session();
-                if current is None {
-                    status = "profile-required";
-                } else {
-                    role = current.app_role;
-                    gradeCode = current.grade_code;
-                    await boot(False);
-                }
-            } except Exception as err {
-                status = "offline";
-                statusMessage = error_text(err);
+        await load_session();
+    }
+
+    async def load_session -> None {
+        if not jacIsLoggedIn() { return; }
+        status = "connecting";
+        statusMessage = "";
+        try {
+            current = await get_current_session();
+            if current is None {
+                status = "profile-required";
+            } else {
+                role = current.app_role;
+                gradeCode = current.grade_code;
+                await boot(False);
             }
+        } except Exception as err {
+            status = "offline";
+            statusMessage = error_text(err);
         }
     }
 
@@ -68,11 +76,16 @@ def:pub AppShell(role: str, gradeCode: str) -> JsxElement {
     def choose_grade(code: str) -> None {
         if code in ["PP2", "Grade 3", "Grade 6", "Grade 9", "Grade 12"] { gradeCode = code; }
     }
-    def retry -> None { boot(False); }
+    def retry -> None { load_session(); }
     def reset_demo -> None { boot(True); }
 
     if not jacIsLoggedIn() { return <Navigate to="/account" replace={True}/>; }
     if status == "profile-required" { return <Navigate to="/account" replace={True}/>; }
+    if not role {
+        return <main className="mx-auto max-w-6xl px-4 py-6 sm:px-8">
+            <BackendBanner status={status} message={statusMessage} onRetry={retry}/>
+        </main>;
+    }
     matches = [g for g in grades if g.code == gradeCode];
     grade: GradeSummaryData | None = matches[0] if matches else (grades[0] if grades else None);
     curriculum: GradeCurriculumData | None = curricula[grade.code] if grade else None;

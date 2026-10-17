@@ -20,7 +20,7 @@ back to curriculum-grounded templates (`source` is "AI" or "TEMPLATE").
 import from uuid { uuid4 }
 import from models {
     BENCHMARK_GRADES, Role, CurriculumLevel, PlanType,
-    GradeNode, CurriculumNode, UserNode, AccountProfile, AccountSession, PlanNode, TutorSessionNode,
+    GradeNode, CurriculumNode, UserNode, AccountProfile, AccountSession, BroadcastBoard, PlanNode, TutorSessionNode,
     HasArea, HasPart, EnrolledIn, ParentOf, Assessed, GradePlan, Covers, HasSession,
     GradeSummary, CurriculumBranch, GradeCurriculum, SeedSummary, PlanSummary,
     AreaProgress, LearnerProgress,
@@ -51,7 +51,7 @@ node ChecklistProgress {
 
 # =============================== account profile
 
-def:priv get_current_session() -> AccountSession | None {
+def:protect get_current_session() -> AccountSession | None {
     profiles = [root -->][?:AccountProfile];
     if not profiles {
         return None;
@@ -65,7 +65,7 @@ def:priv get_current_session() -> AccountSession | None {
     );
 }
 
-def:priv set_account_profile(display_name: str, email: str, app_role: str, grade_code: str) -> AccountSession {
+def:protect set_account_profile(display_name: str, email: str, app_role: str, grade_code: str) -> AccountSession {
     allowed_roles = ["TEACHER", "LEARNER", "PARENT"];
     if app_role not in allowed_roles {
         raise ValueError("Choose Teacher, Learner, or Parent.");
@@ -96,7 +96,7 @@ def:priv set_account_profile(display_name: str, email: str, app_role: str, grade
     );
 }
 
-def:priv save_checklist_progress(plan_id: str, grade_code: str, item: str, is_checked: bool) -> dict[str, bool] {
+def:protect save_checklist_progress(plan_id: str, grade_code: str, item: str, is_checked: bool) -> dict[str, bool] {
     if grade_code not in BENCHMARK_GRADES or not item {
         raise ValueError("Checklist item and a supported grade are required.");
     }
@@ -107,6 +107,23 @@ def:priv save_checklist_progress(plan_id: str, grade_code: str, item: str, is_ch
     updated[item] = is_checked;
     row.checked = updated;
     return updated;
+}
+
+"""The signed-in account's display name, else the name the client sent."""
+def account_name(fallback: str) -> str {
+    profiles = [root -->][?:AccountProfile];
+    return profiles[0].display_name if profiles and profiles[0].display_name else fallback;
+}
+
+"""The grade's broadcast board on the shared graph; every signed-in teacher may attach to it."""
+def broadcast_board(code: str) -> BroadcastBoard {
+    boards = [root.shared -->[?:BroadcastBoard, grade_code == code]];
+    if boards {
+        return boards[0];
+    }
+    board = root.shared ++> BroadcastBoard(grade_code=code);
+    grant(board, level=AccessLevel.CONNECT);
+    return board;
 }
 
 # =============================== graph building
@@ -503,7 +520,7 @@ walker:pub get_curriculum(grade_walker) {
     }
 }
 
-walker:priv generate_lesson_plan(grade_walker) {
+walker:protect generate_lesson_plan(grade_walker) {
     """Teacher agent: traverse grade > learning area > strand and draft a KICD lesson plan."""
     has learning_area: str;
     has strand: str;
@@ -541,13 +558,13 @@ walker:priv generate_lesson_plan(grade_walker) {
         pn = save_plan(
             g, PlanType.LESSON_PLAN, plan.title, plan, source,
             learning_area=self.learning_area, strand=here.name,
-            author=self.teacher_name, covers=[sub]
+            author=account_name(self.teacher_name), covers=[sub]
         );
         report LessonPlanResult(plan_id=jid(pn), source=source, plan=plan);
     }
 }
 
-walker:priv plan_class_materials(grade_walker) {
+walker:protect plan_class_materials(grade_walker) {
     """Teacher agent: locally available material planner for a learning area (optionally one strand)."""
     has learning_area: str;
     has strand: str = "";
@@ -572,7 +589,7 @@ walker:priv plan_class_materials(grade_walker) {
         save_plan(
             g, PlanType.MATERIAL_CHECKLIST, f"{here.name} materials for {self.class_size} learners",
             items, source, learning_area=here.name, strand=self.strand,
-            author=self.teacher_name, covers=subs
+            author=account_name(self.teacher_name), covers=subs
         );
         report MaterialPlanResult(
             source=source, grade_level=g.code, learning_area=here.name,
@@ -598,7 +615,7 @@ def revision_order(g: GradeNode, focus: list[str]) -> list[tuple[str, str]] {
     return ordered;
 }
 
-walker:priv build_revision_and_materials(grade_walker) {
+walker:protect build_revision_and_materials(grade_walker) {
     """Learner agent: termly revision calendar plus a practical material collection checklist."""
     has term_start: str;
     has term_end: str;
@@ -632,7 +649,7 @@ walker:priv build_revision_and_materials(grade_walker) {
     }
 }
 
-walker:priv socratic_tutor(grade_walker) {
+walker:protect socratic_tutor(grade_walker) {
     """Learner agent: Socratic Q and A grounded in retrieved KICD sub-strands; never gives direct answers."""
     has message: str;
     has learner_name: str = "";
@@ -680,7 +697,7 @@ walker:priv socratic_tutor(grade_walker) {
     }
 }
 
-walker:priv translate_for_parent(grade_walker) {
+walker:protect translate_for_parent(grade_walker) {
     """Parent agent: turn a teacher update into jargon-free home support steps (optionally broadcast)."""
     has teacher_update: str;
     has child_name: str = "";
@@ -705,15 +722,18 @@ walker:priv translate_for_parent(grade_walker) {
                 here, PlanType.PARENT_BROADCAST, guide.headline,
                 {"teacher_update": self.teacher_update, "guide": guide},
                 source, learning_area=self.learning_area,
-                author=self.teacher_name, covers=retrieved
+                author=account_name(self.teacher_name), covers=retrieved
             );
+            # Parents live on their own roots, so the broadcast is also pinned to the grade's shared board.
+            broadcast_board(here.code) ++> pn;
+            grant(pn, level=AccessLevel.READ);
             plan_id = jid(pn);
         }
         report ParentGuideResult(plan_id=plan_id, source=source, guide=guide, retrieved=[s.name for s in retrieved]);
     }
 }
 
-walker:priv list_plans(grade_walker) {
+walker:protect list_plans(grade_walker) {
     """List saved plans for a grade, newest first, optionally filtered by plan type."""
     has plan_type: str = "";
     has limit: int = 10;
@@ -721,7 +741,12 @@ walker:priv list_plans(grade_walker) {
 
     can collect with GradeNode entry {
         wanted = self.plan_type;
-        plans = [p for p in [here ->:GradePlan:->[?:PlanNode]] if not wanted or p.plan_type == wanted];
+        if wanted == PlanType.PARENT_BROADCAST {
+            code = here.code;
+            plans = [p for p in [root.shared -->[?:BroadcastBoard, grade_code == code] -->[?:PlanNode]]];
+        } else {
+            plans = [p for p in [here ->:GradePlan:->[?:PlanNode]] if not wanted or p.plan_type == wanted];
+        }
         plans = sorted(plans, key=lambda (p: PlanNode) -> str { return p.created_at; }, reverse=True);
         report [
             PlanSummary(
@@ -734,7 +759,7 @@ walker:priv list_plans(grade_walker) {
     }
 }
 
-walker:priv get_learner_progress(grade_walker) {
+walker:protect get_learner_progress(grade_walker) {
     """Parent view: holistic progress for the grade's learner (KNEC levels, competencies, values)."""
     has reports: list[LearnerProgress] = [];
 
