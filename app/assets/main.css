@@ -1,9 +1,7 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap");
 @import "tailwindcss";
 
-/* Msingi AI calm academic theme: growth greens grounded by slate teal. */
+/* Shared academic palette with role-specific Msingi accents. */
 @theme {
-  /* Primary: newness and growth */
   --color-sage-50: #eef4f0;
   --color-sage-100: #dce9e0;
   --color-sage-200: #bad3c1;
@@ -11,14 +9,11 @@
   --color-sage-500: #4a7c59;
   --color-sage-600: #3f6a4c;
   --color-sage-700: #33573e;
-
   --color-eucalyptus-50: #f1f7f2;
   --color-eucalyptus-100: #e1eee3;
   --color-eucalyptus: #a3c9a8;
   --color-eucalyptus-500: #a3c9a8;
   --color-eucalyptus-600: #86b48c;
-
-  /* Secondary: academic grounding (replaces Tailwind's built-in teal) */
   --color-teal-*: initial;
   --color-teal-50: #edf1f5;
   --color-teal-100: #dce4ec;
@@ -28,43 +23,82 @@
   --color-teal-500: #1e3d59;
   --color-teal-600: #18324a;
   --color-teal-700: #132838;
-
-  /* Backgrounds: calm, low eye-strain */
   --color-alabaster: #f8f9fa;
   --color-ivory: #f4f1ea;
   --color-ivory-dark: #e9e4d8;
-
-  /* Accent: notifications and material checklist alerts */
   --color-ochre-50: #fbf5ee;
   --color-ochre-100: #f6eadc;
   --color-ochre: #d4a373;
   --color-ochre-500: #d4a373;
   --color-ochre-700: #8a5a2b;
-
   --font-sans: "Inter", system-ui, sans-serif;
   --font-serif: "Source Serif 4", Georgia, serif;
-
   --shadow-card: 0 1px 2px rgba(30, 61, 89, 0.06), 0 4px 16px rgba(30, 61, 89, 0.05);
 }
 
-@layer base {
-  html {
-    scroll-behavior: smooth;
-  }
-  body {
-    @apply bg-alabaster font-sans text-teal antialiased;
-  }
+:root {
+  --bg-page: #f8f9fa;
+  --bg-card: #f4f1ea;
+  --border-subtle: #e9e4d8;
+  --text-primary: #1e3d59;
+  --text-secondary: #4f6b85;
+  --sidebar-bg: linear-gradient(180deg, #132838 0%, #18324a 100%);
+  --role-primary: #1e3d59;
+  --role-secondary: #4f6b85;
+  --role-surface-tint: #ebf1f5;
+  --role-hero-bg: radial-gradient(circle at 90% 8%, rgba(43,84,126,.72), transparent 35%), linear-gradient(135deg, #132838, #1e3d59 64%, #2b547e);
+  --role-cta-gradient: linear-gradient(135deg, #1e3d59 0%, #2b547e 100%);
+  --role-glow: 0 0 16px rgba(79,107,133,.38);
 }
 
-@utility scrollbar-none {
-  scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
+[data-theme="teacher"] {
+  --role-primary: #1e3d59;
+  --role-secondary: #4f6b85;
+  --role-surface-tint: #ebf1f5;
+  --role-hero-bg: radial-gradient(circle at 90% 8%, rgba(43,84,126,.72), transparent 35%), linear-gradient(135deg, #132838, #1e3d59 64%, #2b547e);
+  --role-cta-gradient: linear-gradient(135deg, #1e3d59 0%, #2b547e 100%);
+  --role-glow: 0 0 16px rgba(79,107,133,.38);
+}
+[data-theme="learner"] {
+  --role-primary: #4a7c59;
+  --role-secondary: #a3c9a8;
+  --role-surface-tint: #eef4f0;
+  --role-hero-bg: radial-gradient(ellipse at 85% 5%, rgba(163,201,168,.28), transparent 36%), radial-gradient(ellipse at 12% 100%, rgba(212,163,115,.2), transparent 35%), linear-gradient(135deg, #153b33, #1e4d40 64%, #265a48);
+  --role-cta-gradient: linear-gradient(135deg, #4a7c59 0%, #689f77 50%, #d4a373 100%);
+  --role-glow: 0 0 16px rgba(163,201,168,.45);
+}
+[data-theme="parent"] {
+  --role-primary: #d4a373;
+  --role-secondary: #8a5a2b;
+  --role-surface-tint: #fdf8f2;
+  --role-hero-bg: radial-gradient(circle at 90% 8%, rgba(212,163,115,.3), transparent 35%), linear-gradient(135deg, #3e2723, #5d4037 62%, #8a5a2b);
+  --role-cta-gradient: linear-gradient(135deg, #c88a4b 0%, #d4a373 60%, #e6b88a 100%);
+  --role-glow: 0 0 16px rgba(212,163,115,.45);
 }
 
-@media print {
-  body {
-    background: white;
-  }
+html { scroll-behavior: smooth; }
+body {
+  @apply bg-alabaster font-sans text-teal antialiased;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
 }
+[data-theme] *, [data-theme] *::before, [data-theme] *::after {
+  transition: background-color .35s ease, color .35s ease, border-color .35s ease, box-shadow .35s ease;
+}
+.role-sidebar { background: var(--sidebar-bg); }
+.role-hero { background: var(--role-hero-bg); }
+.role-primary-text { color: var(--role-primary); }
+.role-surface { background-color: var(--role-surface-tint); }
+.role-cta { background: var(--role-cta-gradient); box-shadow: 0 6px 20px color-mix(in srgb, var(--role-primary) 35%, transparent); }
+.role-cta:hover { transform: scale(1.02); }
+.role-active { background: color-mix(in srgb, var(--role-primary) 24%, transparent); border: 1px solid var(--role-secondary); box-shadow: var(--role-glow); }
+.role-grade:hover { transform: translateY(-2px); }
+.role-grade-active { background: var(--role-primary); border: 2px solid var(--role-secondary); box-shadow: var(--role-glow), 0 0 0 3px rgba(255,255,255,.82); }
+.role-fact { background: rgba(255,255,255,.08); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.15); border-radius: 12px; }
+.scrollbar-none { scrollbar-width: none; }
+.scrollbar-none::-webkit-scrollbar { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  [data-theme] *, [data-theme] *::before, [data-theme] *::after { transition-duration: .01ms !important; }
+  .role-grade:hover, .role-cta:hover { transform: none; }
+}
+@media print { body { background: white; } }

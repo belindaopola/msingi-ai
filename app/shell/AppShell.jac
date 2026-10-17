@@ -1,4 +1,3 @@
-"""Page shell: owns role, grade, curriculum cache and server status; renders the active workspace."""
 
 import from ..endpoints { seed_kicd_graph, list_grades, get_curriculum }
 # Aliased: spawning a walker emits same-named wire classes for its report types in this module.
@@ -22,19 +21,13 @@ def:pub AppShell -> JsxElement {
         status: str = "connecting",
         statusMessage: str = "";
 
-    async can with entry {
-        await boot(False);
-    }
+    async can with entry { await boot(False); }
 
-    # Fetch each grade's curriculum tree once, the first time it is selected.
     async can with (gradeCode, status) entry {
-        if status != "online" or curricula[gradeCode] {
-            return;
-        }
+        if status != "online" or curricula[gradeCode] { return; }
         code = gradeCode;
         try {
             result = root spawn get_curriculum(grade_level=code);
-            # Subscript assignment: a variable key in a dict literal compiles to a fixed JS key.
             updated = {**curricula};
             updated[code] = result.reports[0];
             curricula = updated;
@@ -50,12 +43,8 @@ def:pub AppShell -> JsxElement {
         try {
             root spawn seed_kicd_graph(reset=reset);
             result = root spawn list_grades();
-            if result.reports {
-                grades = result.reports;
-            }
-            if reset {
-                curricula = {};
-            }
+            if result.reports { grades = result.reports; }
+            if reset { curricula = {}; }
             status = "online";
         } except Exception as err {
             status = "offline";
@@ -67,27 +56,21 @@ def:pub AppShell -> JsxElement {
         role = next_role;
         write_stored("msingi-role", next_role);
     }
-
     def choose_grade(code: str) -> None {
         gradeCode = code;
         write_stored("msingi-grade", code);
     }
-
-    def retry -> None {
-        boot(False);
-    }
-
-    def reset_demo -> None {
-        boot(True);
-    }
+    def retry -> None { boot(False); }
+    def reset_demo -> None { boot(True); }
 
     matches = [g for g in grades if g.code == gradeCode];
     grade: GradeSummaryData | None = matches[0] if matches else (grades[0] if grades else None);
     curriculum: GradeCurriculumData | None = curricula[grade.code] if grade else None;
     tabs = [{"code": g.code, "stage": g.stage} for g in grades] if grades else GRADE_TABS;
     view_key = role + "-" + gradeCode;
+    theme = role.lower();
 
-    <div className="flex min-h-screen bg-alabaster">
+    return <div data-theme={theme} className="flex min-h-screen bg-alabaster text-teal">
         <Sidebar role={role} onRole={choose_role} status={status} onReset={reset_demo}/>
         <div className="flex min-w-0 flex-1 flex-col">
             <div className="sticky top-0 z-20 border-b border-teal-100 bg-alabaster/95 backdrop-blur print:hidden">
@@ -99,13 +82,9 @@ def:pub AppShell -> JsxElement {
                 {if grade {
                     <GradeOverview grade={grade} curriculum={curriculum}/>
                     if status == "online" {
-                        if role == "LEARNER" {
-                            <LearnerView key={view_key} grade={grade} curriculum={curriculum}/>
-                        } elif role == "PARENT" {
-                            <ParentView key={view_key} grade={grade} curriculum={curriculum}/>
-                        } else {
-                            <TeacherView key={view_key} grade={grade} curriculum={curriculum}/>
-                        }
+                        if role == "LEARNER" { <LearnerView key={view_key} grade={grade} curriculum={curriculum}/> }
+                        elif role == "PARENT" { <ParentView key={view_key} grade={grade} curriculum={curriculum}/> }
+                        else { <TeacherView key={view_key} grade={grade} curriculum={curriculum}/> }
                     }
                 }}
             </main>
@@ -113,5 +92,5 @@ def:pub AppShell -> JsxElement {
                 Msingi AI demo. Curriculum content is illustrative and modelled on KICD CBE designs; always confirm against the official curriculum designs.
             </footer>
         </div>
-    </div>
+    </div>;
 }
