@@ -225,7 +225,7 @@ obj LessonStep {
 }
 sem LessonStep.phase = "Lesson phase: Introduction, Lesson Development (Step 1, Step 2, ...), Conclusion, or Extended Activity.";
 sem LessonStep.minutes = "Minutes allocated. All steps together must add up to the lesson duration.";
-sem LessonStep.learner_activity = "What learners actively do, in a learner-centred CBC style (inquiry, pairs, groups, outdoor work).";
+sem LessonStep.learner_activity = "What learners actively do, in a learner-centred CBE style (inquiry, pairs, groups, outdoor work).";
 
 obj LessonPlan {
     has title: str,
@@ -310,7 +310,7 @@ obj TutorReply {
         concepts: list[str],
         encouragement: str;
 }
-sem TutorReply.reply = "Short Socratic response that reacts to the learner's thinking and nudges, never states the final answer.";
+sem TutorReply.reply = "Short Mwalimu Taratibu response that reacts to the learner's thinking and nudges, never states the final answer.";
 sem TutorReply.guiding_question = "One question that moves the learner one step closer to discovering the answer themselves.";
 sem TutorReply.hint_level = "How much scaffolding was given: 1 light nudge, 2 targeted hint, 3 worked example on a similar but different problem.";
 sem TutorReply.concepts = "1 to 3 curriculum concepts this turn touches.";
@@ -342,10 +342,10 @@ obj ParentGuide {
         jargon_buster: list[JargonTerm],
         encouragement: str;
 }
-sem ParentGuide.plain_summary = "2 to 3 sentences in plain, warm language without CBC jargon.";
+sem ParentGuide.plain_summary = "2 to 3 sentences in plain, warm language without CBE jargon.";
 sem ParentGuide.home_activities = "2 or 3 activities that fit into normal home routines (cooking, shopping, farming, chores).";
 sem ParentGuide.questions_to_ask = "Friendly questions a parent can ask the child at supper or on the way to school.";
-sem ParentGuide.jargon_buster = "Every CBC term that appears in the teacher update (strand, sub-strand, SLO, PCI, rubric levels), explained simply.";
+sem ParentGuide.jargon_buster = "Every CBE term that appears in the teacher update (strand, sub-strand, SLO, PCI, rubric levels), explained simply.";
 
 
 # ---------------------------------------------------------------- walker responses

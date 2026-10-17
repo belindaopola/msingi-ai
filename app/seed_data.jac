@@ -1,6 +1,6 @@
 """KICD-aligned seed data for the five Msingi AI benchmark grades.
 
-Mock content modelled on the KICD Competency-Based Curriculum designs for
+Mock content modelled on the KICD Competency Based Education designs for
 PP2, Grade 3, Grade 6, Grade 9 and Grade 12 (Senior School pathways). It is
 illustrative demo data, not an official reproduction of the curriculum
 designs. Each grade carries learning areas -> strands -> sub-strands plus one

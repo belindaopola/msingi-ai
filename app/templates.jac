@@ -20,7 +20,7 @@ glob CBC_GLOSSARY: dict[str, str] = {
     "slo": "Specific Learning Outcome: what your child should be able to do by the end of a lesson.",
     "learning outcome": "What your child should be able to do by the end of a lesson or topic.",
     "pci": "Pertinent and Contemporary Issues: real-life topics like health, safety, money skills and the environment.",
-    "core competenc": "Life skills the CBC builds in every subject, like teamwork, problem solving and creativity.",
+    "core competenc": "Life skills the CBE builds in every subject, like teamwork, problem solving and creativity.",
     "kiq": "Key Inquiry Question: a big question that gets children thinking and exploring.",
     "inquiry question": "A big question that gets children thinking and exploring.",
     "rubric": "The scale teachers use to describe how well a child is doing.",
@@ -35,8 +35,8 @@ glob CBC_GLOSSARY: dict[str, str] = {
     "pathway": "The specialisation a learner chooses in Senior School: STEM, Social Sciences, or Arts and Sports Science.",
     "csl": "Community Service Learning: projects where learners use what they learn to help the community.",
     "community service learning": "Projects where learners use what they learn to help the community.",
-    "learning area": "The CBC name for a subject.",
-    "values": "Good character traits the CBC nurtures, like respect, responsibility and integrity."
+    "learning area": "The CBE name for a subject.",
+    "values": "Good character traits the CBE nurtures, like respect, responsibility and integrity."
 };
 
 """Turn a third-person outcome into a learner's first-person self-check."""

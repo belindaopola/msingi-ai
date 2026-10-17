@@ -1,4 +1,4 @@
-"""Parent workspace: CBC translator, home activities and the holistic progress tracker."""
+"""Parent workspace: CBE translator, home activities and the holistic progress tracker."""
 
 import from ..endpoints { list_plans }
 # Aliased: spawning a walker emits same-named wire classes for its report types in this module.

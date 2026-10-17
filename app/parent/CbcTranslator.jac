@@ -1,4 +1,4 @@
-"""Plain-language CBC translator: turns school messages full of CBC terms into practical guidance."""
+"""Plain-language CBE translator: turns school messages full of CBE terms into practical guidance."""
 
 import from "lucide-react" { BookA, Inbox, Languages, MessageCircleQuestion, Sparkle, TrendingUp }
 import from ..endpoints { translate_for_parent }
@@ -46,8 +46,8 @@ def:pub CbcTranslator(
     <Card
         id="translator"
         icon={<Languages size={18} aria-hidden="true"/>}
-        title="Plain-language CBC Translator"
-        subtitle="Turn school messages full of CBC terms into clear, practical guidance."
+        title="Plain-language CBE Translator"
+        subtitle="Turn school messages full of CBE terms into clear, practical guidance."
     >
         {if broadcasts {
             <div className="mb-4">

@@ -1,4 +1,4 @@
-"""Parent broadcast: teachers write in CBC terms; parents receive a plain-language guide."""
+"""Parent broadcast: teachers write in CBE terms; parents receive a plain-language guide."""
 
 import from "lucide-react" { CheckCircle2, Megaphone, Send }
 import from ..endpoints { translate_for_parent, list_plans }
@@ -58,7 +58,7 @@ def:pub ParentBroadcast(grade: GradeSummary, curriculum: GradeCurriculum | None)
         id="broadcast"
         icon={<Megaphone size={18} aria-hidden="true"/>}
         title="Parent Broadcast"
-        subtitle="Write your update in CBC terms. Parents receive a plain-language version with home activities."
+        subtitle="Write your update in CBE terms. Parents receive a plain-language version with home activities."
     >
         <form onSubmit={submit} className="space-y-3">
             <Field label="Your update to parents">

@@ -33,7 +33,7 @@ def:pub Sidebar(
             </span>
             <div>
                 <p className="font-serif text-xl font-bold text-white">Msingi AI</p>
-                <p className="text-xs text-eucalyptus">CBC companion</p>
+                <p className="text-xs text-eucalyptus">CBE companion</p>
             </div>
         </div>
 

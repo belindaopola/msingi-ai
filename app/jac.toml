@@ -1,7 +1,7 @@
 [project]
 name = "msingi-ai"
 version = "0.1.0"
-description = "Msingi AI: CBC companion for Kenyan teachers, learners and parents (full-stack Jac)"
+description = "Msingi AI: CBE companion for Kenyan teachers, learners and parents (full-stack Jac)"
 entry-point = "main"
 kind = "web-app"
 jac-version = "==0.37.25"
@@ -31,7 +31,7 @@ default_model = "gemini/gemini-3.8-flash"
 
 [client.app_meta_data]
 title = "Msingi AI"
-description = "Msingi AI: CBC companion for Kenyan teachers, learners and parents."
+description = "Msingi AI: CBE companion for Kenyan teachers, learners and parents."
 theme_color = "#1E3D59"
 
 [client.vite]

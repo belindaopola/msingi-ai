@@ -110,7 +110,7 @@ def:pub AppShell -> JsxElement {
                 }}
             </main>
             <footer className="px-4 pb-6 text-center text-xs text-teal-400 sm:px-8 print:hidden">
-                Msingi AI demo. Curriculum content is illustrative and modelled on KICD CBC designs; always confirm against the official curriculum designs.
+                Msingi AI demo. Curriculum content is illustrative and modelled on KICD CBE designs; always confirm against the official curriculum designs.
             </footer>
         </div>
     </div>

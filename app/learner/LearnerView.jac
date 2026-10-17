@@ -1,4 +1,4 @@
-"""Learner workspace: revision calendar, material checklist and Socratic tutor."""
+"""Learner workspace: revision calendar, material checklist and Mwalimu Taratibu."""
 
 import from ..models { GradeSummary, GradeCurriculum, RevisionResult }
 import from .RevisionCalendar { RevisionCalendar }

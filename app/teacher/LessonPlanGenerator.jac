@@ -52,7 +52,7 @@ def:pub LessonPlanGenerator(grade: GradeSummaryData, curriculum: GradeCurriculum
         id="lesson-plan"
         icon={<ClipboardList size={18} aria-hidden="true"/>}
         title="KICD Lesson Plan Generator"
-        subtitle="Traverses the curriculum graph for your strand and drafts a CBC lesson plan with a 4-tier KNEC rubric."
+        subtitle="Traverses the curriculum graph for your strand and drafts a CBE lesson plan with a 4-tier KNEC rubric."
         actions={result and <Button variant="secondary" icon={<Printer size={16} aria-hidden="true"/>} onClick={print_plan}>Print</Button>}
     >
         <form onSubmit={submit} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 print:hidden">

@@ -18,15 +18,15 @@ glob ROLES: list[dict[str, any]] = [
         "panels": [
             {"id": "revision", "label": "Revision Calendar"},
             {"id": "checklist", "label": "Material Checklist"},
-            {"id": "tutor", "label": "Socratic Tutor"}
+            {"id": "tutor", "label": "Mwalimu Taratibu"}
         ]
     },
     {
         "id": "PARENT",
         "label": "Parent",
-        "blurb": "Understand CBC updates and support learning at home.",
+        "blurb": "Understand CBE updates and support learning at home.",
         "panels": [
-            {"id": "translator", "label": "CBC Translator"},
+            {"id": "translator", "label": "CBE Translator"},
             {"id": "home-activities", "label": "Home Activity Guide"},
             {"id": "progress", "label": "Progress Tracker"}
         ]
