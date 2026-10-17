@@ -52,7 +52,7 @@ The curriculum graph and demo people (a teacher, plus one learner and one parent
 
 | Setting | Where | Default |
 |---|---|---|
-| LLM model | `[byllm.model] default_model` in `app/jac.toml`, or the `BYLLM_DEFAULT_MODEL` env var | `gemini/gemini-3.5-flash` |
+| LLM model | `[byllm.model] default_model` in `app/jac.toml`, or the `BYLLM_DEFAULT_MODEL` env var | `gemini/gemini-3.-flash` |
 | Provider key | `GEMINI_API_KEY` (or `GOOGLE_API_KEY`); Anthropic and OpenAI keys also work with a matching model | none (template mode) |
 | Force template mode | `MSINGI_OFFLINE=1` | off |
 
