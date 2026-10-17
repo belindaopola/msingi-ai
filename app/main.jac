@@ -1,20 +1,21 @@
-"""Msingi AI: full-stack Jac app.
 
-Server: the KICD curriculum graph and agent walkers live in `endpoints.jac`
-(each `walker:pub` is served at `POST /walker/<name>`).
-Client: the React UI is written in Jac under `shell/`, `teacher/`, `learner/`,
-`parent/` and `shared/`, and calls the walkers with `root spawn`.
-"""
-
+import from "@jac/runtime" { Router, Routes, Route, AuthGuard, Navigate }
 import from endpoints {
     seed_kicd_graph, list_grades, get_curriculum, generate_lesson_plan,
     plan_class_materials, build_revision_and_materials, socratic_tutor,
-    translate_for_parent, list_plans, get_learner_progress
+    translate_for_parent, list_plans, get_learner_progress,
+    get_current_session, set_account_profile, save_checklist_progress
 }
-
 import "./assets/main.css";
 import from .shell.AppShell { AppShell }
+import from .account.AccountAccess { AccountAccess }
 
 def:pub app -> JsxElement {
-    <AppShell/>
+    return <Router>
+        <Routes>
+            <Route path="/account" element={<AccountAccess/>}/>
+            <Route path="/" element={<AuthGuard redirect="/account"/>}><AppShell/></Route>
+            <Route path="*" element={<Navigate to="/" replace={True}/>}/>
+        </Routes>
+    </Router>;
 }

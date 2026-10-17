@@ -1,9 +1,8 @@
 
-import from ..endpoints { seed_kicd_graph, list_grades, get_curriculum }
-# Aliased: spawning a walker emits same-named wire classes for its report types in this module.
+import from "@jac/runtime" { jacIsLoggedIn, Navigate }
+sv import from ..endpoints { seed_kicd_graph, list_grades, get_curriculum, get_current_session }
 import from ..models { GradeSummary as GradeSummaryData, GradeCurriculum as GradeCurriculumData }
-import from ..shared.constants { GRADE_TABS }
-import from ..shared.browser { read_stored, write_stored, error_text }
+import from ..shared.browser { error_text }
 import from .Sidebar { Sidebar }
 import from .Header { Header }
 import from .GradeSwitcher { GradeSwitcher }
@@ -13,18 +12,32 @@ import from ..teacher.TeacherView { TeacherView }
 import from ..learner.LearnerView { LearnerView }
 import from ..parent.ParentView { ParentView }
 
-def:pub AppShell -> JsxElement {
-    has role: str = read_stored("msingi-role", "TEACHER"),
-        gradeCode: str = read_stored("msingi-grade", "PP2"),
-        grades: list[GradeSummaryData] = [],
+def:pub AppShell(role: str, gradeCode: str) -> JsxElement {
+    has grades: list[GradeSummaryData] = [],
         curricula: dict[str, GradeCurriculumData] = {},
         status: str = "connecting",
         statusMessage: str = "";
 
-    async can with entry { await boot(False); }
+    async can with entry {
+        if jacIsLoggedIn() {
+            try {
+                current = await get_current_session();
+                if current is None {
+                    status = "profile-required";
+                } else {
+                    role = current.app_role;
+                    gradeCode = current.grade_code;
+                    await boot(False);
+                }
+            } except Exception as err {
+                status = "offline";
+                statusMessage = error_text(err);
+            }
+        }
+    }
 
     async can with (gradeCode, status) entry {
-        if status != "online" or curricula[gradeCode] { return; }
+        if not jacIsLoggedIn() or status != "online" or curricula[gradeCode] { return; }
         code = gradeCode;
         try {
             result = root spawn get_curriculum(grade_level=code);
@@ -52,29 +65,32 @@ def:pub AppShell -> JsxElement {
         }
     }
 
-    def choose_role(next_role: str) -> None {
-        role = next_role;
-        write_stored("msingi-role", next_role);
-    }
     def choose_grade(code: str) -> None {
-        gradeCode = code;
-        write_stored("msingi-grade", code);
+        if code in ["PP2", "Grade 3", "Grade 6", "Grade 9", "Grade 12"] { gradeCode = code; }
     }
     def retry -> None { boot(False); }
     def reset_demo -> None { boot(True); }
 
+    if not jacIsLoggedIn() { return <Navigate to="/account" replace={True}/>; }
     matches = [g for g in grades if g.code == gradeCode];
     grade: GradeSummaryData | None = matches[0] if matches else (grades[0] if grades else None);
     curriculum: GradeCurriculumData | None = curricula[grade.code] if grade else None;
-    tabs = [{"code": g.code, "stage": g.stage} for g in grades] if grades else GRADE_TABS;
+    fallback_tabs: list[dict[str, str]] = [
+        {"code": "PP2", "stage": "Early Years Education (Pre-Primary)"},
+        {"code": "Grade 3", "stage": "Lower Primary (End)"},
+        {"code": "Grade 6", "stage": "Upper Primary (End)"},
+        {"code": "Grade 9", "stage": "Junior School (End)"},
+        {"code": "Grade 12", "stage": "Senior School (End)"}
+    ];
+    tabs: list[dict[str, str]] = [{"code": g.code, "stage": g.stage} for g in grades] if grades else fallback_tabs;
     view_key = role + "-" + gradeCode;
     theme = role.lower();
 
     return <div data-theme={theme} className="flex min-h-screen bg-alabaster text-teal">
-        <Sidebar role={role} onRole={choose_role} status={status} onReset={reset_demo}/>
+        <Sidebar role={role} status={status}/>
         <div className="flex min-w-0 flex-1 flex-col">
             <div className="sticky top-0 z-20 border-b border-teal-100 bg-alabaster/95 backdrop-blur print:hidden">
-                <Header role={role} onRole={choose_role}/>
+                <Header role={role}/>
                 <GradeSwitcher tabs={tabs} gradeCode={gradeCode} onGrade={choose_grade}/>
             </div>
             <main className="mx-auto w-full max-w-6xl flex-1 space-y-6 px-4 py-6 sm:px-8">
@@ -88,9 +104,7 @@ def:pub AppShell -> JsxElement {
                     }
                 }}
             </main>
-            <footer className="px-4 pb-6 text-center text-xs text-teal-400 sm:px-8 print:hidden">
-                Msingi AI demo. Curriculum content is illustrative and modelled on KICD CBE designs; always confirm against the official curriculum designs.
-            </footer>
+            <footer className="px-4 pb-6 text-center text-xs text-teal-400 sm:px-8 print:hidden">Msingi AI demo. Curriculum content is illustrative and modelled on KICD CBE designs; always confirm against the official curriculum designs.</footer>
         </div>
     </div>;
 }

@@ -20,7 +20,7 @@ back to curriculum-grounded templates (`source` is "AI" or "TEMPLATE").
 import from uuid { uuid4 }
 import from models {
     BENCHMARK_GRADES, Role, CurriculumLevel, PlanType,
-    GradeNode, CurriculumNode, UserNode, PlanNode, TutorSessionNode,
+    GradeNode, CurriculumNode, UserNode, AccountProfile, AccountSession, PlanNode, TutorSessionNode,
     HasArea, HasPart, EnrolledIn, ParentOf, Assessed, GradePlan, Covers, HasSession,
     GradeSummary, CurriculumBranch, GradeCurriculum, SeedSummary, PlanSummary,
     AreaProgress, LearnerProgress,
@@ -43,7 +43,73 @@ import from templates {
 import from utils { scrub, to_json, now_iso, llm_enabled, week_windows }
 
 
-# ===================================================================== graph building
+node ChecklistProgress {
+    has plan_id: str,
+        grade_code: str,
+        checked: dict[str, bool] = {};
+}
+
+# =============================== account profile
+
+def:priv get_current_session() -> AccountSession | None {
+    profiles = [root -->][?:AccountProfile];
+    if not profiles {
+        return None;
+    }
+    profile = profiles[0];
+    return AccountSession(
+        display_name=profile.display_name,
+        email=profile.email,
+        app_role=profile.app_role,
+        grade_code=profile.grade_code
+    );
+}
+
+def:priv set_account_profile(display_name: str, email: str, app_role: str, grade_code: str) -> AccountSession {
+    allowed_roles = ["TEACHER", "LEARNER", "PARENT"];
+    if app_role not in allowed_roles {
+        raise ValueError("Choose Teacher, Learner, or Parent.");
+    }
+    if grade_code not in BENCHMARK_GRADES {
+        raise ValueError("Choose a supported benchmark grade.");
+    }
+    profiles = [root -->][?:AccountProfile];
+    if profiles {
+        profile = profiles[0];
+        profile.display_name = display_name.strip();
+        profile.email = email.strip().lower();
+        profile.app_role = app_role;
+        profile.grade_code = grade_code;
+    } else {
+        profile = root ++> AccountProfile(
+            display_name=display_name.strip(),
+            email=email.strip().lower(),
+            app_role=app_role,
+            grade_code=grade_code
+        );
+    }
+    return AccountSession(
+        display_name=profile.display_name,
+        email=profile.email,
+        app_role=profile.app_role,
+        grade_code=profile.grade_code
+    );
+}
+
+def:priv save_checklist_progress(plan_id: str, grade_code: str, item: str, is_checked: bool) -> dict[str, bool] {
+    if grade_code not in BENCHMARK_GRADES or not item {
+        raise ValueError("Checklist item and a supported grade are required.");
+    }
+    rows = [root -->][?:ChecklistProgress];
+    matching = [r for r in rows if r.plan_id == plan_id and r.grade_code == grade_code];
+    row = matching[0] if matching else root ++> ChecklistProgress(plan_id=plan_id, grade_code=grade_code);
+    updated = {**row.checked};
+    updated[item] = is_checked;
+    row.checked = updated;
+    return updated;
+}
+
+# =============================== graph building
 
 def spec_for(code: str) -> dict[str, any] {
     for spec in KICD_SEED {
@@ -437,7 +503,7 @@ walker:pub get_curriculum(grade_walker) {
     }
 }
 
-walker:pub generate_lesson_plan(grade_walker) {
+walker:priv generate_lesson_plan(grade_walker) {
     """Teacher agent: traverse grade > learning area > strand and draft a KICD lesson plan."""
     has learning_area: str;
     has strand: str;
@@ -481,7 +547,7 @@ walker:pub generate_lesson_plan(grade_walker) {
     }
 }
 
-walker:pub plan_class_materials(grade_walker) {
+walker:priv plan_class_materials(grade_walker) {
     """Teacher agent: locally available material planner for a learning area (optionally one strand)."""
     has learning_area: str;
     has strand: str = "";
@@ -532,7 +598,7 @@ def revision_order(g: GradeNode, focus: list[str]) -> list[tuple[str, str]] {
     return ordered;
 }
 
-walker:pub build_revision_and_materials(grade_walker) {
+walker:priv build_revision_and_materials(grade_walker) {
     """Learner agent: termly revision calendar plus a practical material collection checklist."""
     has term_start: str;
     has term_end: str;
@@ -566,7 +632,7 @@ walker:pub build_revision_and_materials(grade_walker) {
     }
 }
 
-walker:pub socratic_tutor(grade_walker) {
+walker:priv socratic_tutor(grade_walker) {
     """Learner agent: Socratic Q and A grounded in retrieved KICD sub-strands; never gives direct answers."""
     has message: str;
     has learner_name: str = "";
@@ -614,7 +680,7 @@ walker:pub socratic_tutor(grade_walker) {
     }
 }
 
-walker:pub translate_for_parent(grade_walker) {
+walker:priv translate_for_parent(grade_walker) {
     """Parent agent: turn a teacher update into jargon-free home support steps (optionally broadcast)."""
     has teacher_update: str;
     has child_name: str = "";
@@ -647,7 +713,7 @@ walker:pub translate_for_parent(grade_walker) {
     }
 }
 
-walker:pub list_plans(grade_walker) {
+walker:priv list_plans(grade_walker) {
     """List saved plans for a grade, newest first, optionally filtered by plan type."""
     has plan_type: str = "";
     has limit: int = 10;
@@ -668,7 +734,7 @@ walker:pub list_plans(grade_walker) {
     }
 }
 
-walker:pub get_learner_progress(grade_walker) {
+walker:priv get_learner_progress(grade_walker) {
     """Parent view: holistic progress for the grade's learner (KNEC levels, competencies, values)."""
     has reports: list[LearnerProgress] = [];
 

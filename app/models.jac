@@ -80,6 +80,20 @@ node UserNode {
         teacher_note: str = "";
 }
 
+node AccountProfile {
+    has display_name: str,
+        email: str,
+        app_role: str,
+        grade_code: str = "PP2";
+}
+
+obj AccountSession {
+    has display_name: str,
+        email: str,
+        app_role: str,
+        grade_code: str;
+}
+
 node PlanNode {
     has plan_type: str,
         title: str,
