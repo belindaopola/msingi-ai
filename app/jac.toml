@@ -53,3 +53,6 @@ project_id = "prj_08eab268ca2e4d68be5cf91e8be9bdd1"
 
 [serve.compression]
 enabled = false
+
+[scale.monitoring]
+enabled = true

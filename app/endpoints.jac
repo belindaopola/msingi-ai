@@ -17,6 +17,8 @@ Agents run through byLLM when a provider key is configured, otherwise they fall
 back to curriculum-grounded templates (`source` is "AI" or "TEMPLATE").
 """
 
+import os;
+import hmac;
 import from uuid { uuid4 }
 import from models {
     BENCHMARK_GRADES, Role, CurriculumLevel, PlanType,
@@ -88,6 +90,27 @@ def:protect set_account_profile(display_name: str, email: str, app_role: str, gr
             grade_code=grade_code
         );
     }
+    return AccountSession(
+        display_name=profile.display_name,
+        email=profile.email,
+        app_role=profile.app_role,
+        grade_code=profile.grade_code
+    );
+}
+
+"""Give the caller's account the ALL role (every workspace). Needs the server's MSINGI_ALL_ACCESS_CODE;
+with no code configured it always refuses, and the public sign-up form cannot set ALL."""
+def:protect grant_all_workspaces(access_code: str) -> AccountSession {
+    expected = os.environ.get("MSINGI_ALL_ACCESS_CODE", "");
+    if not expected or not hmac.compare_digest(access_code.encode(), expected.encode()) {
+        raise PermissionError("All-workspace access is not available for this account.");
+    }
+    profiles = [root -->][?:AccountProfile];
+    if not profiles {
+        raise ValueError("Create the account profile first.");
+    }
+    profile = profiles[0];
+    profile.app_role = "ALL";
     return AccountSession(
         display_name=profile.display_name,
         email=profile.email,

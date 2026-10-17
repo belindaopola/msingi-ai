@@ -2,7 +2,7 @@
 import from "@jac/runtime" { jacIsLoggedIn, Navigate }
 import from ..endpoints { seed_kicd_graph, list_grades, get_curriculum, get_current_session }
 import from ..models { GradeSummary as GradeSummaryData, GradeCurriculum as GradeCurriculumData }
-import from ..shared.browser { error_text }
+import from ..shared.browser { error_text, read_stored, write_stored }
 import from .Sidebar { Sidebar }
 import from .Header { Header }
 import from .GradeSwitcher { GradeSwitcher }
@@ -15,6 +15,7 @@ import from ..parent.ParentView { ParentView }
 """Signed-in workspace. The role and starting grade come from the account profile (`get_current_session`)."""
 def:pub AppShell -> JsxElement {
     has role: str = "",
+        allAccess: bool = False,
         gradeCode: str = "PP2",
         grades: list[GradeSummaryData] = [],
         curricula: dict[str, GradeCurriculumData] = {},
@@ -34,7 +35,9 @@ def:pub AppShell -> JsxElement {
             if current is None {
                 status = "profile-required";
             } else {
-                role = current.app_role;
+                # ALL-role accounts may switch workspaces; remember their last choice in this browser.
+                allAccess = current.app_role == "ALL";
+                role = read_stored("msingi-role", "TEACHER") if allAccess else current.app_role;
                 gradeCode = current.grade_code;
                 await boot(False);
             }
@@ -76,6 +79,12 @@ def:pub AppShell -> JsxElement {
     def choose_grade(code: str) -> None {
         if code in ["PP2", "Grade 3", "Grade 6", "Grade 9", "Grade 12"] { gradeCode = code; }
     }
+    def choose_role(next_role: str) -> None {
+        if allAccess and next_role in ["TEACHER", "LEARNER", "PARENT"] {
+            role = next_role;
+            write_stored("msingi-role", next_role);
+        }
+    }
     def retry -> None { load_session(); }
     def reset_demo -> None { boot(True); }
 
@@ -104,7 +113,7 @@ def:pub AppShell -> JsxElement {
         <Sidebar role={role} status={status}/>
         <div className="flex min-w-0 flex-1 flex-col">
             <div className="sticky top-0 z-20 border-b border-teal-100 bg-alabaster/95 backdrop-blur print:hidden">
-                <Header role={role}/>
+                <Header role={role} allAccess={allAccess} onRole={choose_role}/>
                 <GradeSwitcher tabs={tabs} gradeCode={gradeCode} onGrade={choose_grade}/>
             </div>
             <main className="mx-auto w-full max-w-6xl flex-1 space-y-6 px-4 py-6 sm:px-8">
